@@ -11,6 +11,13 @@ export class Searchbar extends Component {
   state = {
     inputValue: '',
   };
+  handleChange = e => {
+    const { value } = e.target;
+    this.setState({
+      inputValue: value,
+    });
+  };
+
   handleSubmit = e => {
     e.preventDefault();
     const { inputValue } = this.state;
@@ -21,15 +28,8 @@ export class Searchbar extends Component {
     this.setState({ inputValue: '' });
   };
 
-  handleChange = e => {
-    const { value } = e.target;
-    this.setState({
-      inputValue: value,
-    });
-  };
-
   render() {
-    const { value } = this.state;
+    const { inputValue } = this.state;
     return (
       <SearchbarStyle>
         <SearchForm onSubmit={this.handleSubmit}>
@@ -45,7 +45,7 @@ export class Searchbar extends Component {
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
-            value={value}
+            value={inputValue}
             onChange={this.handleChange}
           />
         </SearchForm>
