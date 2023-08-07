@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Searchbar } from './Searchbar/Searchbar';
@@ -6,7 +7,7 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Button } from './Button/Button';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
-import { fetchImg } from './Api/Fetch';
+import { fetchImg } from '../api/fetch';
 import { createPortal } from 'react-dom';
 const modalRoot = document.querySelector('#modal-root');
 
@@ -39,25 +40,23 @@ export class App extends Component {
     }
   }
 
-  handleSubmit = ({ search }) => {
-    if (search.trim() === '') {
+  handleSubmit = ({ inputValue }) => {
+    if (inputValue.trim() === '') {
       return;
     }
-    this.setState({ request: search });
-    this.handleReset();
+    this.setState({ request: inputValue, response: [], page: 1 });
   };
+
   handleNextPage = () => {
     this.setState(prevState => ({
       page: prevState.page + 1,
     }));
   };
-  handleReset = () => {
-    this.setState({ response: [], page: 1 });
-  };
-  limitPage(totalHits) {
-    const { response, page } = this.state;
 
-    const limitPage = page * response.length > totalHits;
+  limitPage(totalHits) {
+    const { page } = this.state;
+
+    const limitPage = page < Math.ceil(totalHits / 12);
     this.setState({ isLimitPage: limitPage });
   }
   openLargeImage = largeImageURL => {
@@ -76,15 +75,17 @@ export class App extends Component {
       <>
         <div className="App">
           <Searchbar request={this.handleSubmit} />
-          {status === 'pending' && <Loader />}
           <ImageGallery
             status={status}
             response={response}
             onClick={this.openLargeImage}
           />
-          {response.length !== 0 && !isLimitPage && (
-            <Button onClick={this.handleNextPage} />
-          )}
+          {status === 'pending' && <Loader />}
+
+          {status === 'pending'
+            ? null
+            : response.length !== 0 &&
+              isLimitPage && <Button onClick={this.handleNextPage} />}
         </div>
         {largeImg &&
           createPortal(

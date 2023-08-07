@@ -8,15 +8,28 @@ export class Searchbar extends Component {
   static propTypes = {
     request: PropTypes.func.isRequired,
   };
-
+  state = {
+    inputValue: '',
+  };
   handleSubmit = e => {
     e.preventDefault();
-    const form = e.currentTarget;
-    const search = form.elements.search.value;
-    this.props.request({ search });
-    form.reset();
+    const { inputValue } = this.state;
+    if (inputValue === '') {
+      return;
+    }
+    this.props.request(this.state);
+    this.setState({ inputValue: '' });
   };
+
+  handleChange = e => {
+    const { value } = e.target;
+    this.setState({
+      inputValue: value,
+    });
+  };
+
   render() {
+    const { value } = this.state;
     return (
       <SearchbarStyle>
         <SearchForm onSubmit={this.handleSubmit}>
@@ -32,6 +45,8 @@ export class Searchbar extends Component {
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
+            value={value}
+            onChange={this.handleChange}
           />
         </SearchForm>
       </SearchbarStyle>
